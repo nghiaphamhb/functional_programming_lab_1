@@ -26,27 +26,27 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libgmp-dev
 
-      # CÀI TẤT CẢ TOOL CẦN THIẾT (có lint)
-      - name: Install tools (dune, ocamlformat, ounit2, zarith, lint tools)
+      # Cài tất cả tool cần thiết (không có opam-dune-lint)
+      - name: Install tools
         run: |
-          opam install -y dune ocamlformat ounit2 zarith opam-dune-lint
+          opam install -y dune ocamlformat ounit2 zarith ocaml-lint
 
-      # ---- LINT ----
-      # 1) Lint metadata .opam
-      - name: Lint opam files (opam lint)
+      # 🧹 Lint code OCaml
+      - name: OCaml Lint
+        working-directory: euler_13
+        run: |
+          eval $(opam env)
+          echo "Running ocaml-lint..."
+          ocaml-lint $(find . -name '*.ml' -o -name '*.mli')
+
+      # 🧾 Lint metadata .opam
+      - name: Lint opam files
         working-directory: euler_13
         run: |
           eval $(opam env)
           opam lint .
 
-      # 2) Lint tính nhất quán dune <-> opam
-      - name: Lint dune/opam deps (opam dune-lint)
-        working-directory: euler_13
-        run: |
-          eval $(opam env)
-          opam dune-lint
-
-      # ---- FORMAT ----
+      # 🎨 Kiểm tra định dạng code
       - name: Format check
         working-directory: euler_13
         run: |
@@ -54,13 +54,14 @@ jobs:
           ocamlformat --version
           ocamlformat --check $(git ls-files '*.ml' '*.mli')
 
-      # ---- BUILD/TEST ----
+      # 🏗️ Build project
       - name: Build
         working-directory: euler_13
         run: |
           eval $(opam env)
           dune build
 
+      # 🧾 Run tests
       - name: Run tests
         working-directory: euler_13
         run: |
