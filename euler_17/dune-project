@@ -1,0 +1,27 @@
+(lang dune 3.20)
+
+(name euler_17)
+
+(generate_opam_files true)
+
+(source
+ (github nghiaphamhb/functional_programming_lab_1))
+
+(authors "Pham Dang Trung Nghia <phamdangtrungnghia@gmail.com>")
+
+(maintainers "Pham Dang Trung Nghia <phamdangtrungnghia@gmail.com>")
+
+(license "MIT")
+
+(documentation https://url/to/documentation)
+
+(package
+ (name euler_17)
+ (synopsis "A short synopsis")
+ (description "A longer description")
+ (depends ocaml)
+ (tags
+  ("add topics" "to describe" your project))
+  (allow_empty))
+
+; See the complete stanza docs at https://dune.readthedocs.io/en/stable/reference/dune-project/index.html

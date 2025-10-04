@@ -1,0 +1,72 @@
+name: OCaml CI - Euler 17
+
+on:
+  push:
+    branches: [ main, "feature/**" ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1️⃣ Lấy mã nguồn
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      # 2️⃣ Cài môi trường OCaml
+      - name: Setup OCaml
+        uses: ocaml/setup-ocaml@v3
+        with:
+          ocaml-compiler: '4.14.0'
+          dune-cache: true
+
+      # 3️⃣ Cài gói hệ thống (zarith cần libgmp-dev)
+      - name: Install system deps for zarith (GMP)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgmp-dev
+
+      # 4️⃣ Cài các công cụ và thư viện cần thiết
+      - name: Install OCaml tools and libraries
+        run: |
+          opam install -y dune ocamlformat ounit2 zarith
+
+      # 5️⃣ Lint code (compiler warnings)
+      - name: OCaml Lint (compiler warnings)
+        working-directory: euler_17
+        run: |
+          eval $(opam env)
+          echo "Running OCaml lint via compiler warnings..."
+          dune build --profile dev
+
+      # 6️⃣ Kiểm tra file .opam
+      - name: Lint opam files
+        working-directory: euler_17
+        run: |
+          eval $(opam env)
+          opam lint .
+
+      # 7️⃣ Kiểm tra format code
+      - name: Format check
+        working-directory: euler_17
+        run: |
+          eval $(opam env)
+          echo "Checking code formatting..."
+          ocamlformat --version
+          ocamlformat --check $(git ls-files '*.ml' '*.mli')
+
+      # 8️⃣ Build project
+      - name: Build project
+        working-directory: euler_17
+        run: |
+          eval $(opam env)
+          dune build
+
+      # 9️⃣ Chạy test OUnit2
+      - name: Run tests
+        working-directory: euler_17
+        run: |
+          eval $(opam env)
+          dune runtest

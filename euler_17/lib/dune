@@ -1,0 +1,4 @@
+(library
+ (name euler_lib)
+ (modules num_to_words tail_recursion fold_map recursion lazy_seq))
+
