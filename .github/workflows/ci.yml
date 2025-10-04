@@ -21,7 +21,7 @@ jobs:
           dune-cache: true
 
       - name: Install tools (dune, ocamlformat, ounit2)
-        run: opam install -y dune ocamlformat ounit2
+        run: opam install -y dune ocamlformat ounit2 zarith
 
       - name: Format check
         working-directory: euler_13
