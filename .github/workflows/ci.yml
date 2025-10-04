@@ -1,6 +1,5 @@
 name: OCaml CI
 
-# Chạy CI khi push hoặc pull request vào main hoặc bất kỳ branch feature nào
 on:
   push:
     branches:
@@ -15,19 +14,19 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
       - name: Setup OCaml
         uses: avsm/setup-ocaml@v2
         with:
           ocaml-compiler: "4.14.0"
-          opam-version: '2.3'
+          opam-repositories: default
+          opam-disable-sandboxing: true
 
       - name: Install dependencies
         run: |
-          opam install dune ocamlformat ounit2 -y
           eval $(opam env)
+          opam install dune ocamlformat ounit2 -y
 
       - name: Format check
         run: |
@@ -37,7 +36,7 @@ jobs:
       - name: Build project
         run: |
           cd euler_13
-          dune build @all -w +a-e-4-5-6-7-8-9-27
+          dune build @all
 
       - name: Run tests
         run: |
