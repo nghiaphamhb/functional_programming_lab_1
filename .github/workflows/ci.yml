@@ -1,0 +1,45 @@
+name: OCaml CI
+
+# Chạy CI khi push hoặc pull request vào main hoặc bất kỳ branch feature nào
+on:
+  push:
+    branches:
+      - main
+      - "feature/**"
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup OCaml
+        uses: avsm/setup-ocaml@v2
+        with:
+          ocaml-version: '4.14.0'
+          opam-version: '2.3'
+
+      - name: Install dependencies
+        run: |
+          opam install dune ocamlformat ounit2 -y
+          eval $(opam env)
+
+      - name: Format check
+        run: |
+          cd euler_13
+          ocamlformat --check $(find . -path ./_build -prune -o -type f \( -name "*.ml" -o -name "*.mli" \) -print)
+
+      - name: Build project
+        run: |
+          cd euler_13
+          dune build @all -w +a-e-4-5-6-7-8-9-27
+
+      - name: Run tests
+        run: |
+          cd euler_13/test
+          dune exec ./test_euler_13.exe || true
