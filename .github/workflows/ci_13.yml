@@ -14,23 +14,43 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v5
 
-      - name: Setup OCaml
+      - name: Setup OCaml environment
         uses: ocaml/setup-ocaml@v3
         with:
           ocaml-compiler: '4.14.0'
           dune-cache: true
 
-      - name: Install tools (dune, ocamlformat, ounit2)
-        run: opam install -y dune ocamlformat ounit2 zarith
+      - name: Install system dependency for zarith (GMP)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgmp-dev
+
+      - name: Install OCaml tools and libraries
+        run: |
+          opam install -y dune ocamlformat ounit2 zarith
+
+      - name: OCaml Lint (compiler warnings)
+        working-directory: euler_13
+        run: |
+          eval $(opam env)
+          echo "Running lint (compiler warnings)..."
+          dune build --profile dev
+
+      - name: Lint opam files
+        working-directory: euler_13
+        run: |
+          eval $(opam env)
+          opam lint .
 
       - name: Format check
         working-directory: euler_13
         run: |
           eval $(opam env)
+          echo "Checking code formatting..."
           ocamlformat --version
           ocamlformat --check $(git ls-files '*.ml' '*.mli')
 
-      - name: Build
+      - name: Build project
         working-directory: euler_13
         run: |
           eval $(opam env)
