@@ -11,7 +11,7 @@
 
 (maintainers "Pham Dang Trung Nghia <phamdangtrungnghia@gmail.com>")
 
-(license LICENSE)
+(license "MIT")
 
 (documentation https://url/to/documentation)
 
