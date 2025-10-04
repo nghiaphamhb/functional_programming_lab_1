@@ -2,53 +2,40 @@ name: OCaml CI - Euler 13
 
 on:
   push:
-    branches:
-      - main
-      - "feature/**"
+    branches: [ main, "feature/**" ]
   pull_request:
-    branches:
-      - main
+    branches: [ main ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout project euler 13 
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install dependencies
-        run: |
-          eval $(opam env)
-          opam install dune ocamlformat ounit2 -y
+      - name: Setup OCaml
+        uses: avsm/setup-ocaml@v4
+        with:
+          ocaml-compiler: '4.14.0'
+          dune-cache: true
 
-      
-      - name: Install OCaml & opam manually
+      - name: Install tools (dune, ocamlformat, ounit2)
         run: |
-          sudo rm -rf /home/runner/.opam
-          sudo apt-get update
-          sudo apt-get install -y opam
-          opam init --disable-sandboxing -y
-          eval $(opam env)
-          opam switch create 4.14.0 || true
-          eval $(opam env)
-          opam install dune ocamlformat ounit2 -y
+          opam install -y dune ocamlformat ounit2
 
-      # 2️⃣ Format check
-      - name: Format check Euler 13
+      - name: Format check
+        working-directory: euler_13
         run: |
-          eval $(opam env)
-          cd euler_13
-          ocamlformat --check $(find . -path ./_build -prune -o -type f \( -name "*.ml" -o -name "*.mli" \) -print)
+          ocamlformat --version
+          ocamlformat --check $(git ls-files '*.ml' '*.mli')
 
-      # 3️⃣ Build project
-      - name: Build Euler 13
+      - name: Build
+        working-directory: euler_13
         run: |
-          cd euler_13
-          dune build @check 
+          dune build
 
-      # # 4️⃣ Run tests
-      # - name: Run tests Euler 13
-      #   run: |
-      #     cd euler_13/test
-      #     dune exec ./test_euler_13.exe || true
+      - name: Run tests (optional)
+        working-directory: euler_13
+        run: |
+          dune runtest
