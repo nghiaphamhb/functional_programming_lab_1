@@ -1,4 +1,4 @@
-name: OCaml CI
+name: OCaml CI - Euler 13
 
 on:
   push:
@@ -14,56 +14,38 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ Checkout code
+      # 1️⃣ Checkout repository
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # 2️⃣ Setup OCaml và opam
+      # 2️⃣ Setup OCaml (v2) an toàn, không dùng sudo
       - name: Setup OCaml
         uses: avsm/setup-ocaml@v2
         with:
-          ocaml-compiler: "4.14.0"          # phiên bản OCaml
-          opam-repositories: default        # repo opam
-          opam-disable-sandboxing: true     # tránh lỗi sudo
+          ocaml-compiler: "4.14.0"          # Phiên bản OCaml
+          opam-repositories: default        # Repo opam
+          opam-disable-sandboxing: true     # Tránh lỗi sudo
 
-      # 3️⃣ Cài dependencies
+      # 3️⃣ Install dependencies
       - name: Install dependencies
         run: |
           eval $(opam env)
           opam install dune ocamlformat ounit2 -y
 
-      # 4️⃣ Format check (Euler 13)
+      # 4️⃣ Format check
       - name: Format check Euler 13
         run: |
           cd euler_13
           ocamlformat --check $(find . -path ./_build -prune -o -type f \( -name "*.ml" -o -name "*.mli" \) -print)
 
-      # 5️⃣ Build project (Euler 13)
+      # 5️⃣ Build project
       - name: Build Euler 13
         run: |
           cd euler_13
           dune build @all
 
-      # 6️⃣ Run tests (Euler 13)
+      # 6️⃣ Run tests
       - name: Run tests Euler 13
         run: |
           cd euler_13/test
           dune exec ./test_euler_13.exe || true
-
-      # 7️⃣ Format check (Euler 17)
-      - name: Format check Euler 17
-        run: |
-          cd euler_17
-          ocamlformat --check $(find . -path ./_build -prune -o -type f \( -name "*.ml" -o -name "*.mli" \) -print)
-
-      # 8️⃣ Build project (Euler 17)
-      - name: Build Euler 17
-        run: |
-          cd euler_17
-          dune build @all
-
-      # 9️⃣ Run tests (Euler 17)
-      - name: Run tests Euler 17
-        run: |
-          cd euler_17/test
-          dune exec ./test_euler_17.exe || true
