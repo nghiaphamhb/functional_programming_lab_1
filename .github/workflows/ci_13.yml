@@ -11,57 +11,60 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # 1️⃣ Checkout repository
       - name: Checkout repository
         uses: actions/checkout@v5
 
+      # 2️⃣ Setup OCaml environment
       - name: Setup OCaml
         uses: ocaml/setup-ocaml@v3
         with:
           ocaml-compiler: '4.14.0'
           dune-cache: true
 
-      # Zarith cần GMP ở runner
+      # 3️⃣ Install system dependency for zarith
       - name: Install system deps for zarith (GMP)
         run: |
           sudo apt-get update
           sudo apt-get install -y libgmp-dev
 
-      # Cài tất cả tool cần thiết (không có opam-dune-lint)
-      - name: Install tools
+      # 4️⃣ Install project tools
+      - name: Install OCaml tools and libraries
         run: |
-          opam install -y dune ocamlformat ounit2 zarith ocaml-lint
+          opam install -y dune ocamlformat ounit2 zarith
 
-      # 🧹 Lint code OCaml
-      - name: OCaml Lint
+      # 5️⃣ Lint: kiểm tra cảnh báo & lỗi biên dịch
+      - name: OCaml Lint (compiler warnings)
         working-directory: euler_13
         run: |
           eval $(opam env)
-          echo "Running ocaml-lint..."
-          ocaml-lint $(find . -name '*.ml' -o -name '*.mli')
+          echo "Running lint (compiler warnings)..."
+          dune build --profile dev
 
-      # 🧾 Lint metadata .opam
+      # 6️⃣ Kiểm tra file .opam
       - name: Lint opam files
         working-directory: euler_13
         run: |
           eval $(opam env)
           opam lint .
 
-      # 🎨 Kiểm tra định dạng code
+      # 7️⃣ Kiểm tra format code
       - name: Format check
         working-directory: euler_13
         run: |
           eval $(opam env)
+          echo "Checking code formatting..."
           ocamlformat --version
           ocamlformat --check $(git ls-files '*.ml' '*.mli')
 
-      # 🏗️ Build project
-      - name: Build
+      # 8️⃣ Build project
+      - name: Build project
         working-directory: euler_13
         run: |
           eval $(opam env)
           dune build
 
-      # 🧾 Run tests
+      # 9️⃣ Run tests
       - name: Run tests
         working-directory: euler_13
         run: |
