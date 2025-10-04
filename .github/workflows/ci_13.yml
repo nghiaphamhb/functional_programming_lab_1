@@ -11,29 +11,24 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 1️⃣ Checkout repository
       - name: Checkout repository
         uses: actions/checkout@v5
 
-      # 2️⃣ Setup OCaml environment
-      - name: Setup OCaml
+      - name: Setup OCaml environment
         uses: ocaml/setup-ocaml@v3
         with:
           ocaml-compiler: '4.14.0'
           dune-cache: true
 
-      # 3️⃣ Install system dependency for zarith
-      - name: Install system deps for zarith (GMP)
+      - name: Install system dependency for zarith (GMP)
         run: |
           sudo apt-get update
           sudo apt-get install -y libgmp-dev
 
-      # 4️⃣ Install project tools
       - name: Install OCaml tools and libraries
         run: |
           opam install -y dune ocamlformat ounit2 zarith
 
-      # 5️⃣ Lint: kiểm tra cảnh báo & lỗi biên dịch
       - name: OCaml Lint (compiler warnings)
         working-directory: euler_13
         run: |
@@ -41,14 +36,12 @@ jobs:
           echo "Running lint (compiler warnings)..."
           dune build --profile dev
 
-      # 6️⃣ Kiểm tra file .opam
       - name: Lint opam files
         working-directory: euler_13
         run: |
           eval $(opam env)
           opam lint .
 
-      # 7️⃣ Kiểm tra format code
       - name: Format check
         working-directory: euler_13
         run: |
@@ -57,14 +50,12 @@ jobs:
           ocamlformat --version
           ocamlformat --check $(git ls-files '*.ml' '*.mli')
 
-      # 8️⃣ Build project
       - name: Build project
         working-directory: euler_13
         run: |
           eval $(opam env)
           dune build
 
-      # 9️⃣ Run tests
       - name: Run tests
         working-directory: euler_13
         run: |
