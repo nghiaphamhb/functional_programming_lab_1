@@ -21,7 +21,7 @@ jobs:
       - name: Setup OCaml
         uses: avsm/setup-ocaml@v2
         with:
-          ocaml-version: '4.14.0'
+          ocaml-compiler: "4.14.0"
           opam-version: '2.3'
 
       - name: Install dependencies
