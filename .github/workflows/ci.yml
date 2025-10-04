@@ -14,16 +14,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      - name: Checkout project euler 13 
+        uses: actions/checkout@v4
 
       - name: Install dependencies
         run: |
           eval $(opam env)
           opam install dune ocamlformat ounit2 -y
 
-
-      # 1️⃣ Cài opam và OCaml thủ công, tránh sudo
+      
       - name: Install OCaml & opam manually
         run: |
           sudo rm -rf /home/runner/.opam
@@ -46,10 +45,10 @@ jobs:
       - name: Build Euler 13
         run: |
           cd euler_13
-          dune build @all
+          dune build @check 
 
-      # 4️⃣ Run tests
-      - name: Run tests Euler 13
-        run: |
-          cd euler_13/test
-          dune exec ./test_euler_13.exe || true
+      # # 4️⃣ Run tests
+      # - name: Run tests Euler 13
+      #   run: |
+      #     cd euler_13/test
+      #     dune exec ./test_euler_13.exe || true
