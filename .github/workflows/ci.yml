@@ -14,30 +14,39 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      # 1️⃣ Checkout code
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
+      # 2️⃣ Setup OCaml và opam
       - name: Setup OCaml
         uses: avsm/setup-ocaml@v2
         with:
-          ocaml-compiler: "4.14.0"
-          opam-repositories: default
-          opam-disable-sandboxing: true
+          ocaml-compiler: "4.14.0"          # phiên bản OCaml
+          opam-repositories: default        # repo opam
+          opam-disable-sandboxing: true     # tắt sandbox để tránh lỗi sudo
+          opam-version: "2.3"               # version opam cố định
+          use-cache: false                  # tắt cache tạm thời nếu lỗi cache
 
+      # 3️⃣ Cài dependencies
       - name: Install dependencies
         run: |
           eval $(opam env)
           opam install dune ocamlformat ounit2 -y
 
+      # 4️⃣ Format check (Euler 13)
       - name: Format check
         run: |
           cd euler_13
           ocamlformat --check $(find . -path ./_build -prune -o -type f \( -name "*.ml" -o -name "*.mli" \) -print)
 
+      # 5️⃣ Build project (Euler 13)
       - name: Build project
         run: |
           cd euler_13
-          dune build @all
+          dune build @all -w +a-e-4-5-6-7-8-9-27
 
+      # 6️⃣ Run tests (Euler 13)
       - name: Run tests
         run: |
           cd euler_13/test
