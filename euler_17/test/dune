@@ -1,0 +1,4 @@
+(executable
+ (name test_euler_17)
+ (modules test_euler_17)
+ (libraries ounit2 euler_lib))
