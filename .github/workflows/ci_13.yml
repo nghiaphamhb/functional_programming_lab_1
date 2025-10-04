@@ -1,0 +1,68 @@
+name: OCaml CI - Euler 13
+
+on:
+  push:
+    branches: [ main, "feature/**" ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Setup OCaml
+        uses: ocaml/setup-ocaml@v3
+        with:
+          ocaml-compiler: '4.14.0'
+          dune-cache: true
+
+      # Zarith cần GMP ở runner
+      - name: Install system deps for zarith (GMP)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgmp-dev
+
+      # CÀI TẤT CẢ TOOL CẦN THIẾT (có lint)
+      - name: Install tools (dune, ocamlformat, ounit2, zarith, lint tools)
+        run: |
+          opam install -y dune ocamlformat ounit2 zarith opam-dune-lint
+
+      # ---- LINT ----
+      # 1) Lint metadata .opam
+      - name: Lint opam files (opam lint)
+        working-directory: euler_13
+        run: |
+          eval $(opam env)
+          opam lint .
+
+      # 2) Lint tính nhất quán dune <-> opam
+      - name: Lint dune/opam deps (opam dune-lint)
+        working-directory: euler_13
+        run: |
+          eval $(opam env)
+          opam dune-lint
+
+      # ---- FORMAT ----
+      - name: Format check
+        working-directory: euler_13
+        run: |
+          eval $(opam env)
+          ocamlformat --version
+          ocamlformat --check $(git ls-files '*.ml' '*.mli')
+
+      # ---- BUILD/TEST ----
+      - name: Build
+        working-directory: euler_13
+        run: |
+          eval $(opam env)
+          dune build
+
+      - name: Run tests
+        working-directory: euler_13
+        run: |
+          eval $(opam env)
+          dune runtest
