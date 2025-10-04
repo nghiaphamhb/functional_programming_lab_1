@@ -1,5 +1,0 @@
-(executable
- (public_name euler_13)
- (name main)
- (modules main Recursion Tail_recursion Fold Numbers Lazy_seq)
- (libraries euler_13 zarith))
