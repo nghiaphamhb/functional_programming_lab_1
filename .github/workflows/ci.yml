@@ -12,30 +12,32 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup OCaml
-        uses: avsm/setup-ocaml@v3
+        uses: ocaml/setup-ocaml@v3
         with:
           ocaml-compiler: '4.14.0'
           dune-cache: true
 
       - name: Install tools (dune, ocamlformat, ounit2)
-        run: |
-          opam install -y dune ocamlformat ounit2
+        run: opam install -y dune ocamlformat ounit2
 
       - name: Format check
         working-directory: euler_13
         run: |
+          eval $(opam env)
           ocamlformat --version
           ocamlformat --check $(git ls-files '*.ml' '*.mli')
 
       - name: Build
         working-directory: euler_13
         run: |
+          eval $(opam env)
           dune build
 
-      - name: Run tests (optional)
+      - name: Run tests
         working-directory: euler_13
         run: |
+          eval $(opam env)
           dune runtest
