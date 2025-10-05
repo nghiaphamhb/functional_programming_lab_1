@@ -267,7 +267,7 @@ let sum_seq a b =
   let nums = unfold (fun n -> if n > b then None else Some (n, n + 1)) a in
   nums |> map letters |> fold_left ( + ) 0
 ```
-### Hàm test (test/test_euler_17.ml)
+### Функция test (test/test_euler_17.ml)
 ```ocaml
 open OUnit2
 open Euler_lib
