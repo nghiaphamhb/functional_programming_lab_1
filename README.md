@@ -1,21 +1,22 @@
-# Bài thực hành số 1
-## Project Euler số 13, số 17
+# Лабораторная работа 1
+## Проект Эйлера №13, №17
 
-- Học sinh: Pham Dang Trung Nghia
-- Lớp: P3321
-- ISU: 374806
-- Ngôn ngữ hàm: OCaml
+- Студент: Фам Данг Чунг Нгиа
+- Группа: P3321
+- ИСУ: 374806
+- Функциональный язык: OCaml
 
-## Problem 13 
-- Tên: Large Sum
-- Miêu tả: https://projecteuler.net/problem=13
-- Yêu cầu: Work out the first ten digits of the sum of the following one-hundred 50-digit numbers.
+## Проблема №13 
+- Название: Large Sum
+- Описание: https://projecteuler.net/problem=13
+- Задание: Work out the first ten digits of the sum of the following one-hundred 50-digit numbers.
 
-### Cơ bản ý tưởng giải quyết 
-Trong các giải pháp, chúng ta thực hiện cộng tất cả 100 số nguyên 50 chữ số. Mỗi số được lưu dưới dạng string và chuyển sang kiểu số nguyên lớn (Z.t trong OCaml) bằng cách sử dụng List.map. 
-Dùng các phương pháp khác nhau để tính tổng tất cả các số đó. Cuối cùng, lấy 10 chữ số đầu của kết quả tổng và in ra.
+### Основная идея решения 
+В рамках решения мы выполняем суммирование всех 100 целых чисел по 50 цифр. Каждое число хранится в виде строки и преобразуется в тип больших целых чисел (`Z.t` в OCaml) с помощью `List.map`.
+Для вычисления суммы используются разные подходы. В конце берутся первые 10 цифр полученной суммы и выводятся на экран.
 
-### Module chứa data (numbers.ml)
+
+### Модуль передачи данных (bin/numbers.ml)
 ```ocaml
 let numbers_str =
   [
@@ -25,8 +26,8 @@ let numbers_str =
     "46376937677490009712648124896970078050417018260538"
   ]
 ```
-### Hàm chính (main.ml)
-Gọi ra các phương thức giải quyết và in ra kết quả thực thi chúng để so sánh  
+### Основные функции (bin/main.ml)
+Вызывает решения и распечатывает результаты выполнения для сравнения  
 ```ocaml 
 (*function*)
 let first_10_digits n =
@@ -61,7 +62,7 @@ let () =
     answer_recur answer_tail_recur answer_fold answer_lazy_seq
 ```
 
-### Giải quyết qua đệ quy (recursion.ml)
+### Решение через рекурсию (bin/recursion.ml)
 ```ocaml
 let sum list =
   let rec sum_recur list =
@@ -70,7 +71,7 @@ let sum list =
   sum_recur list
 ```
 
-### Giải quyết qua đệ quy đuôi (tail_recursion.ml)
+### Решение через хвостовую рекурсию (bin/tail_recursion.ml)
 ```ocaml
 let sum list =
   let rec sum_tail_recur acc list =
@@ -79,12 +80,12 @@ let sum list =
   sum_tail_recur Z.zero list
 ```
 
-### Giải quyết qua khối (fold.ml)
+### Решение через модульность (bin/fold.ml)
 ```ocaml
 let sum list = List.fold_left Z.add Z.zero list
 ```
 
-### Giải quyết qua lazy sequence (lazy_seq.ml)
+### Решение через ленивые коллекции (bin/lazy_seq.ml)
 ```ocaml
 type 'a seq_node =
   | Nil (*end of sequence*)
@@ -103,7 +104,7 @@ let sum numbers =
   seq_fold_left Z.add Z.zero list_seq
 ```
 
-### Giải quyết qua ngôn ngữ chỉ định (Java) 
+### Решение через императивный язык (Java) 
 ```java
 import java.math.BigInteger;
 
@@ -139,7 +140,7 @@ public class Euler13 {
 }
 ```
 
-### Kết quả thực thi
+### Результаты выполнения
 OCaml bash:
 ```bash
 The first 10 digits of the sum are:
@@ -158,18 +159,19 @@ Process finished with exit code 0
 
 ```
 
-## Problem 17 
-- Tên: Number Letter Counts
-- Miêu tả: If the numbers 1 to 5 are written out in words: one, two, three, four, five, then there are 3 + 3 + 5 + 4 + 4 = 19 letters used in total. Chi tiết hơn ở [đây](https://projecteuler.net/problem=17)
-- Yêu cầu: If all the numbers from 1 to 1000 (one thousand) inclusive were written out in words, how many letters would be used?
+## Проблема №17 
+- Название: Number Letter Counts
+- Описание: If the numbers 1 to 5 are written out in words: one, two, three, four, five, then there are 3 + 3 + 5 + 4 + 4 = 19 letters used in total. Chi tiết hơn ở [đây](https://projecteuler.net/problem=17)
+- Задание: If all the numbers from 1 to 1000 (one thousand) inclusive were written out in words, how many letters would be used?
 
-### Cơ bản ý tưởng giải quyết 
-Ý tưởng là chuyển từng số từ 1 đến 1000 thành chữ tiếng Anh, theo quy tắc Anh–Anh (có “and” cho số trăm, bỏ khoảng trắng và dấu gạch nối). 
-Sau đó, tính số chữ cái của mỗi số. Có thể triển khai nhiều cách: đệ quy đuôi, đệ quy thường, map/fold hoặc lazy sequence, trong khi phần logic chuyển số sang chữ được tách riêng 
-để tái sử dụng cho tất cả các phương pháp. 
-Tổng cuối cùng là tổng số chữ cái của toàn bộ dãy 1–1000.
+### Основная идея решения 
+Идея заключается в том, чтобы преобразовать каждое число от 1 до 1000 в английские слова по правилам британского английского (с «and» для сотен, без пробелов и дефисов).
+Затем вычисляется количество букв в каждом числе. Решение можно реализовать разными способами: хвостовая рекурсия, обычная рекурсия, map/fold или ленивые последовательности, 
+при этом логика преобразования числа в слова вынесена в отдельный модуль для повторного использования во всех методах.
+Итоговая сумма — это общее количество букв для всего диапазона от 1 до 1000.
 
-### Hàm chuyển số sang chữ (lib/num_to_words.ml)
+
+### Функция переключения цифр на буквы (lib/num_to_words.ml)
 ```ocaml 
 let ones =
   [|
@@ -210,8 +212,8 @@ let letters_count s =
 let letters n = letters_count (str_en_uk n)
 ```
 
-### Hàm chính (bin/main.ml)
-Gọi ra các phương thức giải quyết và in ra kết quả thực thi chúng để so sánh  
+### Основные функции (bin/main.ml)
+Вызывает решения и распечатывает результаты выполнения для сравнения  
 ```ocaml
 open Euler_lib
 
@@ -230,7 +232,7 @@ let () =
 ```
 
 
-### Giải quyết qua đệ quy (lib/recursion.ml)
+### Решение через рекурсию (lib/recursion.ml)
 ```ocaml
 open Num_to_words
 
@@ -238,7 +240,7 @@ let rec sum_recursive a b =
   if a > b then 0 else letters a + sum_recursive (a + 1) b
 ```
 
-### Giải quyết qua đệ quy đuôi (lib/tail_recursion.ml)
+### Решение через хвостовую рекурсию (lib/tail_recursion.ml)
 ```ocaml
 open Num_to_words
 
@@ -247,7 +249,7 @@ let sum_tail a b =
   loop 0 a
 ```
 
-### Giải quyết qua khối (lib/fold_map.ml)
+### Решение через модульность (lib/fold_map.ml)
 ```ocaml
 open Num_to_words
 
@@ -256,7 +258,7 @@ let sum_fold_map a b =
   |> List.map letters |> List.fold_left ( + ) 0
 ```
 
-### Giải quyết qua lazy sequence (lib/lazy_seq.ml)
+### Решение через ленивые коллекции (lib/lazy_seq.ml)
 ```ocaml
 open Num_to_words
 
@@ -285,7 +287,7 @@ let suite =
 let () = run_test_tt_main suite
 ```
 
-### Giải quyết qua ngôn ngữ chỉ định (Java) 
+### Решение через императивный язык (Java) 
 ```java
 import java.util.stream.IntStream;
 
@@ -344,7 +346,7 @@ public class Euler17 {
 }
 ```
 
-### Kết quả thực thi
+### Результаты выполнения
 OCaml base:
 ```bash
 [Tail Recursion ] Answer: 21124
@@ -359,14 +361,14 @@ Answer: 21124
 Process finished with exit code 0
 ```
 
-## **Kết luận**
+## Выводы
+В процессе решения задач я применял некоторые характерные техники функционального языка OCaml:
 
-Trong quá trình giải quyết các bài toán, tôi đã áp dụng một số kỹ thuật đặc trưng của ngôn ngữ hàm OCaml:
+- **Рекурсия** – как обычная, так и хвостовая – для реализации циклов.
+- **Pattern Matching** – для ветвлений, присваивания значений; применяется к шаблонам и спискам и т.д.
 
-* **Đệ quy** – cả đệ quy thường và đệ quy đuôi – để hiện thực hóa các vòng lặp.
-* **Pattern Matching** – để thực hiện các nhánh điều kiện, gán giá trị; áp dụng cho pattern và danh sách; v.v.
+Кроме того, я попробовал несколько решений из любопытства, например, с использованием **map/fold**, **ленивых последовательностей (lazy sequence)**. Это позволило осознать, что разделение на модули, повторное использование функций и работа с коллекциями в OCaml очень удобны.
 
-Ngoài ra, tôi còn thử một vài giải pháp khác từ sự tò mò, như sử dụng **map/fold**, **lazy sequence**. Qua đó nhận ra rằng việc tách module, tái sử dụng hàm, và làm việc với các collections trong OCaml rất tiện lợi.
+В итоге, для некоторых задач решение на OCaml может быть удобнее, чем на традиционных императивных языках, а для других задач – наоборот.
+Вывод: функциональный язык OCaml действительно очень интересен.
 
-Tóm lại, với một số bài toán, viết giải pháp bằng OCaml có thể tiện lợi hơn so với các ngôn ngữ lập trình mệnh lệnh truyền thống, nhưng với bài toán khác, lại ngược lại. 
-Kết luận cuối cùng: ngôn ngữ hàm OCaml thật sự rất thú vị. 
