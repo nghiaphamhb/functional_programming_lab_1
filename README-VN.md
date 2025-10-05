@@ -359,11 +359,6 @@ Answer: 21124
 Process finished with exit code 0
 ```
 
-# Kết luận
-Được, mình viết lại kết luận **bằng tiếng Việt**, dành cho **OCaml**, bỏ đoạn “Thực tế cho thấy”:
-
----
-
 ## **Kết luận**
 
 Trong quá trình giải quyết các bài toán, tôi đã áp dụng một số kỹ thuật đặc trưng của ngôn ngữ hàm OCaml:
