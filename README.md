@@ -161,7 +161,7 @@ Process finished with exit code 0
 
 ## Проблема №17 
 - Название: Number Letter Counts
-- Описание: If the numbers 1 to 5 are written out in words: one, two, three, four, five, then there are 3 + 3 + 5 + 4 + 4 = 19 letters used in total. Chi tiết hơn ở [đây](https://projecteuler.net/problem=17)
+- Описание: If the numbers 1 to 5 are written out in words: one, two, three, four, five, then there are 3 + 3 + 5 + 4 + 4 = 19 letters used in total. Подробнее [здесь](https://projecteuler.net/problem=17)
 - Задание: If all the numbers from 1 to 1000 (one thousand) inclusive were written out in words, how many letters would be used?
 
 ### Основная идея решения 
