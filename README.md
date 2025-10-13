@@ -24,7 +24,14 @@ let first_10_digits n =
   first_ten n_str
 
 (*sequence generation*)
-let numbers = Seq_generation.numbers (*list of z.t*)
+let numbers_str =
+  [
+    (*list of string*)
+    "37107287533902102798797998220837590246510135740250";
+      (* ... *)
+    "46376937677490009712648124896970078050417018260538"
+  ]
+let numbers = List.map Z.of_string numbers_str 
 
 let sum_tail_recur =
   let rec loop acc xs =
@@ -48,7 +55,14 @@ let first_10_digits n =
   first_ten n_str
 
 (*sequence generation*)
-let numbers = Seq_generation.numbers (*list of z.t*)
+let numbers_str =
+  [
+    (*list of string*)
+    "37107287533902102798797998220837590246510135740250";
+      (* ... *)
+    "46376937677490009712648124896970078050417018260538"
+  ]
+let numbers = List.map Z.of_string numbers_str 
 
 let sum_recur =
   let rec loop xs =
