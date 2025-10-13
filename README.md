@@ -23,7 +23,6 @@ let first_10_digits n =
   let n_str = Z.to_string n in
   first_ten n_str
 
-(*sequence generation*)
 let numbers_str =
   [
     (*list of string*)
@@ -54,7 +53,6 @@ let first_10_digits n =
   let n_str = Z.to_string n in
   first_ten n_str
 
-(*sequence generation*)
 let numbers_str =
   [
     (*list of string*)
