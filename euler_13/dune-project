@@ -5,13 +5,13 @@
 (generate_opam_files true)
 
 (source
- (github nghiaphamhb/functional_programming_lab_1))
+ (github username/reponame))
 
-(authors "Pham Dang Trung Nghia <phamdangtrungnghia@gmail.com>")
+(authors "Author Name <author@example.com>")
 
-(maintainers "Pham Dang Trung Nghia <phamdangtrungnghia@gmail.com>")
+(maintainers "Maintainer Name <maintainer@example.com>")
 
-(license "MIT")
+(license LICENSE)
 
 (documentation https://url/to/documentation)
 
