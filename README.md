@@ -15,8 +15,55 @@
 В рамках решения мы выполняем суммирование всех 100 целых чисел по 50 цифр. Каждое число хранится в виде строки и преобразуется в тип больших целых чисел (`Z.t` в OCaml) с помощью `List.map`.
 Для вычисления суммы используются разные подходы. В конце берутся первые 10 цифр полученной суммы и выводятся на экран.
 
+### Решение через хвостовую рекурсию 
+```ocaml
+(*function to take first 10 digits of number z.t*)
+let first_10_digits n =
+  let first_ten n_str = String.sub n_str 0 10 in
+  let n_str = Z.to_string n in
+  first_ten n_str
 
-### Модуль генерации последовательности (bin/numbers.ml)
+(*sequence generation*)
+let numbers = Seq_generation.numbers (*list of z.t*)
+
+let sum_tail_recur =
+  let rec loop acc xs =
+    match xs with [] -> acc | x :: tl -> loop (Z.add acc x) tl
+  in
+  loop Z.zero numbers
+
+let answer_tail_recur = first_10_digits sum_tail_recur (*string*)
+
+let () =
+  Printf.printf "The first 10 digits of the sum are [Tail recursion]: \n%s\n"
+    answer_tail_recur
+```
+
+### Решение через рекурсию 
+```ocaml
+(*function to take first 10 digits of number z.t*)
+let first_10_digits n =
+  let first_ten n_str = String.sub n_str 0 10 in
+  let n_str = Z.to_string n in
+  first_ten n_str
+
+(*sequence generation*)
+let numbers = Seq_generation.numbers (*list of z.t*)
+
+let sum_recur =
+  let rec loop xs =
+    match xs with [] -> Z.zero | x :: tl -> Z.add x (loop tl)
+  in
+  loop numbers
+
+let answer_recur = first_10_digits sum_recur (*string*)
+
+let () =
+  Printf.printf "The first 10 digits of the sum are [Recursion]: \n%s\n"
+    answer_recur
+```
+### Решение через модульность
+#### Модуль генерации последовательности (bin/seq_generation.ml)
 ```ocaml
 let numbers_str =
   [
@@ -25,62 +72,22 @@ let numbers_str =
       (* ... *)
     "46376937677490009712648124896970078050417018260538"
   ]
+let numbers = List.map Z.of_string numbers_str 
 ```
-### Основные функции (bin/main.ml)
-Вызывает решения и распечатывает результаты выполнения для сравнения  
-```ocaml 
-(*function*)
-let first_10_digits n =
-  let first_ten n_str = String.sub n_str 0 10 in
-  let n_str = Z.to_string n in
-  first_ten n_str
-
-(*begin: map data*)
-let numbers = List.map Z.of_string Numbers.numbers_str (*list of z.t*)
-
-(*calculate sum*)
-let sum_recur = Recursion.sum numbers (*z.t*)
-let sum_tail_recur = Tail_recursion.sum numbers
-let sum_fold = Fold.sum numbers
-let sum_lazy_seq = Lazy_seq.sum numbers
-
-(*take first 10 digist of sum*)
-let answer_recur = first_10_digits sum_recur (*string*)
-let answer_tail_recur = first_10_digits sum_tail_recur
-let answer_fold = first_10_digits sum_fold
-let answer_lazy_seq = first_10_digits sum_lazy_seq
-
-(*output*)
-let () =
-  Printf.printf
-    "The first 10 digits of the sum are:  \n\
-     [1- Recursion| 2- Tail_recursion| 3- Fold| 4- Lazy sequence]:\n\n\
-     [1] %s \n\
-     [2] %s\n\
-     [3] %s\n\
-     [4] %s\n"
-    answer_recur answer_tail_recur answer_fold answer_lazy_seq
-```
-
-### Решение через рекурсию (bin/recursion.ml)
+#### Модуль фильтра (bin/filter.ml)
 ```ocaml
-let sum list =
-  let rec sum_recur list =
-    match list with [] -> Z.zero | x :: xs -> Z.add x (sum_recur xs)
-  in
-  sum_recur list
-```
+let has_len_eq_10 s =
+  (*boolean*)
+  String.length (String.trim s) = 10
 
-### Решение через хвостовую рекурсию (bin/tail_recursion.ml)
-```ocaml
-let sum list =
-  let rec sum_tail_recur acc list =
-    match list with [] -> acc | x :: xs -> sum_tail_recur (Z.add acc x) xs
-  in
-  sum_tail_recur Z.zero list
+let ensure_len_eq10 label s =
+  (*string*)
+  if has_len_eq_10 s then s
+  else (
+    Printf.eprintf "[ERROR]: %s Take answer more than 10 digits\n" label;
+    exit 2)
 ```
-
-### Решение через модульность (bin/fold.ml)
+#### Модуль fold/reduce (bin/fold.ml)
 ```ocaml
 let sum list = List.fold_left Z.add Z.zero list
 ```
