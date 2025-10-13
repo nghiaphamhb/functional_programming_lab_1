@@ -104,7 +104,7 @@ let ensure_len_eq10 label s =
 let sum list = List.fold_left Z.add Z.zero list
 ```
 
-#### Решение через ленивые коллекции (bin/lazy_seq.ml)
+#### (Модуль) Решение через ленивые коллекции (bin/lazy_seq.ml)
 ```ocaml
 type 'a seq_node =
   | Nil (*end of sequence*)
