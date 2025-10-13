@@ -48,7 +48,20 @@ jobs:
           eval $(opam env)
           echo "Checking code formatting..."
           ocamlformat --version
-          ocamlformat --check $(git ls-files '*.ml' '*.mli')
+          files="$(git ls-files -- '*.ml' '*.mli')"
+          if [ -z "$files" ]; then
+            echo "No OCaml files to format."
+            exit 0
+          fi
+          failed=0
+          for f in $files; do
+            if ! ocamlformat --check "$f"; then
+              echo "Not formatted: $f"
+              failed=1
+            fi
+          done
+          exit $failed
+
 
       - name: Build project
         working-directory: euler_13
