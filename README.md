@@ -92,7 +92,7 @@ let ensure_len_eq10 label s =
 let sum list = List.fold_left Z.add Z.zero list
 ```
 
-### Решение через ленивые коллекции (bin/lazy_seq.ml)
+#### Решение через ленивые коллекции (bin/lazy_seq.ml)
 ```ocaml
 type 'a seq_node =
   | Nil (*end of sequence*)
@@ -150,13 +150,14 @@ public class Euler13 {
 ### Результаты выполнения
 OCaml bash:
 ```bash
-The first 10 digits of the sum are:
-[1- Recursion| 2- Tail_recursion| 3- Fold| 4- Lazy sequence]:
-
-[1] 5537376230
-[2] 5537376230
-[3] 5537376230
-[4] 5537376230
+The first 10 digits of the sum are [Tail recursion]:
+5537376230
+The first 10 digits of the sum are [Recursion]:
+5537376230
+The first 10 digits of the sum are [Fold]:
+5537376230
+The first 10 digits of the sum are [Lazy sequence]:
+5537376230
 ```
 Java console: 
 ```console
