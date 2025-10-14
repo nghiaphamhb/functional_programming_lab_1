@@ -232,77 +232,101 @@ let letters_count s =
 let letters n = letters_count (str_en_uk n)
 ```
 
-### Основные функции (bin/main.ml)
-Вызывает решения и распечатывает результаты выполнения для сравнения  
+### Решение через хвостовую рекурсию 
 ```ocaml
 open Euler_lib
+open Printf
 
-let () =
-  let a, b = (1, 1000) in
-  let ans_tail = Tail_recursion.sum_tail a b in
-  let ans_rec = Recursion.sum_recursive a b in
-  let ans_fold = Fold_map.sum_fold_map a b in
-  let ans_seq = try Lazy_seq.sum_seq a b with _ -> -1 in
-
-  Printf.printf "[Tail Recursion ] Answer: %d\n" ans_tail;
-  Printf.printf "[Recursion      ] Answer: %d\n" ans_rec;
-  Printf.printf "[Fold/Map       ] Answer: %d\n" ans_fold;
-  if ans_seq >= 0 then Printf.printf "[Lazy Seq       ] Answer: %d\n" ans_seq
-  else Printf.printf "[Lazy Seq       ] (skipped - Seq not available)\n"
-```
-
-
-### Решение через рекурсию (lib/recursion.ml)
-```ocaml
-open Num_to_words
-
-let rec sum_recursive a b =
-  if a > b then 0 else letters a + sum_recursive (a + 1) b
-```
-
-### Решение через хвостовую рекурсию (lib/tail_recursion.ml)
-```ocaml
-open Num_to_words
+let a, b = (1, 1000)
 
 let sum_tail a b =
+  let open Num_to_words in
   let rec loop acc n = if n > b then acc else loop (acc + letters n) (n + 1) in
   loop 0 a
+
+let ans_tail = sum_tail a b
+let () = printf "Answer [Tail Recursion ]: %d\n" ans_tail
 ```
 
-### Решение через модульность (lib/fold_map.ml)
+
+### Решение через рекурсию 
+```ocaml
+open Euler_lib
+open Printf
+
+let a, b = (1, 1000)
+
+let rec sum_recursive a b =
+  let open Num_to_words in
+  if a > b then 0 else letters a + sum_recursive (a + 1) b
+
+let ans_rec = sum_recursive a b
+let () = printf "Answer [Recursion      ]: %d\n" ans_rec
+```
+
+### Решение через модульность
+#### Модуль генерации последовательности (lib/seq_generation.ml)
+```ocaml
+let ints_list_map a b =
+  if a > b then []
+  else List.init (b - a + 1) Fun.id |> List.map (fun i -> a + i)
+
+let ints_seq_map a b =
+  if a > b then Seq.empty
+  else
+    Seq.unfold (fun i -> if i > b - a then None else Some (i, i + 1)) 0
+    |> Seq.map (fun i -> a + i)
+```
+
+#### Модуль фильтра (lib/filter.ml)
+```ocaml
+let in_range_1_1000 n = n >= 1 && n <= 1000
+let keep_valid_ints_list = List.filter in_range_1_1000
+let keep_valid_ints_seq = Seq.filter in_range_1_1000
+```
+
+#### Модуль fold/reduce (lib/fold.ml)
 ```ocaml
 open Num_to_words
 
-let sum_fold_map a b =
-  List.init (b - a + 1) (fun i -> a + i)
-  |> List.map letters |> List.fold_left ( + ) 0
+let sum_letters_list xs = List.fold_left (fun acc x -> acc + letters x) 0 xs
 ```
 
-### Решение через ленивые коллекции (lib/lazy_seq.ml)
+#### (Модуль) Решение через ленивые коллекции (lib/lazy_seq.ml)
 ```ocaml
 open Num_to_words
 
-let sum_seq a b =
-  let open Seq in
-  let nums = unfold (fun n -> if n > b then None else Some (n, n + 1)) a in
-  nums |> map letters |> fold_left ( + ) 0
+let sum_letters_seq s = Seq.fold_left (fun acc n -> acc + letters n) 0 s
 ```
 ### Функция test (test/test_euler_17.ml)
 ```ocaml
 open OUnit2
 open Euler_lib
+open Num_to_words
+
+let pp_int = string_of_int
 
 let test_letters _ =
-  assert_equal 23 (Num_to_words.letters 342);
-  assert_equal 20 (Num_to_words.letters 115)
+  assert_equal ~printer:pp_int 23 (letters 342);
+  assert_equal ~printer:pp_int 20 (letters 115)
 
-let test_sum_fold_map _ =
-  let sum = Fold_map.sum_fold_map 1 5 in
-  assert_equal 19 sum
+let test_sum_list_1_5 _ =
+  let xs = Seq_generation.ints_list_map 1 5 |> Filter.keep_valid_ints_list in
+  let sum = Fold.sum_letters_list xs in
+  assert_equal ~printer:pp_int 19 sum
+
+let test_sum_seq_1_5 _ =
+  let s = Seq_generation.ints_seq_map 1 5 |> Filter.keep_valid_ints_seq in
+  let sum = Lazy_seq.sum_letters_seq s in
+  assert_equal ~printer:pp_int 19 sum
 
 let suite =
   "Euler17 Tests"
-  >::: [ "letters" >:: test_letters; "sum_fold_map" >:: test_sum_fold_map ]
+  >::: [
+         "letters_342_115" >:: test_letters;
+         "sum_list_1_5" >:: test_sum_list_1_5;
+         "sum_seq_1_5" >:: test_sum_seq_1_5;
+       ]
 
 let () = run_test_tt_main suite
 ```
@@ -369,10 +393,10 @@ public class Euler17 {
 ### Результаты выполнения
 OCaml base:
 ```bash
-[Tail Recursion ] Answer: 21124
-[Recursion      ] Answer: 21124
-[Fold/Map       ] Answer: 21124
-[Lazy Seq       ] Answer: 21124
+Answer [Tail Recursion ]: 21124
+Answer [Recursion      ]: 21124
+Answer [Fold/Reduce    ]: 21124
+Answer [Lazy Seq       ]: 21124
 ```
 Java console: 
 ```console
