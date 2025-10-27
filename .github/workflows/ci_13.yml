@@ -28,7 +28,7 @@ jobs:
 
       - name: Install OCaml tools and libraries
         run: |
-          opam install -y dune ocamlformat ounit2 zarith
+          opam install -y dune ocamlformat.0.27.0 ounit2 zarith
 
       - name: OCaml Lint (compiler warnings) #reset the OPAM environment variable
         working-directory: euler_13 # default: $GITHUB_WORKSPACE
