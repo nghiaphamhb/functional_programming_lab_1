@@ -1,5 +1,5 @@
 (executable
  (public_name euler_13)
  (name main)
- (modules main Fold Seq_generation Lazy_seq Filter)
+ (modules main)
  (libraries zarith))
