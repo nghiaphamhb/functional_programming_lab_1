@@ -89,7 +89,7 @@ let filtered_sum_lq : string =
     Printf.eprintf "[ERROR]: [Lazy sequence] Take answer more than 10 digits\n";
     exit 2)
 ```
-#### 3.5. euler_13/bin/main.ml
+#### 3.5. Вывод результатов модулей
 ```ocaml
 let () =
   Printf.printf
