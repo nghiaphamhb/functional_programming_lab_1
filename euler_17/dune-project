@@ -7,11 +7,11 @@
 (source
  (github nghiaphamhb/functional_programming_lab_1))
 
-(authors "Pham Dang Trung Nghia <phamdangtrungnghia@gmail.com>")
+(authors "Nghia Pham <phamdangtrungnghia@gmail.com>")
 
-(maintainers "Pham Dang Trung Nghia <phamdangtrungnghia@gmail.com>")
+(maintainers "Nghia Pham <phamdangtrungnghia@gmail.com>")
 
-(license "MIT")
+(license MIT)
 
 (documentation https://url/to/documentation)
 

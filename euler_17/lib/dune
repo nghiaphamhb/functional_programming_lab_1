@@ -1,3 +1,3 @@
 (library
  (name euler_lib)
- (modules num_to_words fold lazy_seq seq_generation filter))
+ (modules num_to_words))
