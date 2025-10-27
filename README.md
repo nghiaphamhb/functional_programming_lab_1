@@ -263,6 +263,9 @@ let () =
 ### 3. Решение через модульность
 #### 3.1. Модуля генерации последовательности 
 ```ocaml
+open Printf
+open Num_to_words
+
 let list =
   let a, b = (1, 1000) in
   if a > b then []
