@@ -2,16 +2,16 @@
 
 (name euler_13)
 
-(generate_opam_files true)
+(generate_opam_files true) ;Dune sẽ tự động sinh file euler_13.opam dựa trên thông tin trong dune-project
 
 (source
- (github username/reponame))
+ (github nghiaphamhb/functional_programming_lab_1))
 
-(authors "Author Name <author@example.com>")
+(authors "Nghia Pham <phamdangtrungnghia@gmail.com>")
 
-(maintainers "Maintainer Name <maintainer@example.com>")
+(maintainers "Nghia Pham <phamdangtrungnghia@gmail.com>")
 
-(license LICENSE)
+(license MIT)
 
 (documentation https://url/to/documentation)
 
