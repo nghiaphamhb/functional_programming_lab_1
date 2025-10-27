@@ -167,39 +167,64 @@ Process finished with exit code 0
 Итоговая сумма — это общее количество букв для всего диапазона от 1 до 1000.
 
 
-### Функция переключения цифр на буквы (lib/num_to_words.ml)
+### 0. Функция переключения цифр на буквы (lib/num_to_words.ml)
 ```ocaml 
 let ones =
-  [|
-    ""; "one"; "two"; "three"; "four"; "five"; "six"; "seven"; "eight"; "nine";
-    "ten"; "eleven"; "twelve"; "thirteen"; "fourteen"; "fifteen"; "sixteen"; "seventeen"; "eighteen"; "nineteen";
-  |]
+  [
+    "";
+    "one";
+    "two";
+    "three";
+    "four";
+    "five";
+    "six";
+    "seven";
+    "eight";
+    "nine";
+    "ten";
+    "eleven";
+    "twelve";
+    "thirteen";
+    "fourteen";
+    "fifteen";
+    "sixteen";
+    "seventeen";
+    "eighteen";
+    "nineteen";
+  ]
 
 let tens =
-  [|
-    ""; ""; "twenty"; "thirty"; "forty"; "fifty"; "sixty"; "seventy"; "eighty"; "ninety";
-  |]
+  [
+    "";
+    "";
+    "twenty";
+    "thirty";
+    "forty";
+    "fifty";
+    "sixty";
+    "seventy";
+    "eighty";
+    "ninety";
+  ]
 
 let str_en_uk n =
   if n = 1000 then "one thousand"
   else
-    let h = n / 100 in
-    let r = n mod 100 in
+    let h = n / 100 and r = n mod 100 in
     let hundred_part =
       if h = 0 then ""
-      else if r = 0 then ones.(h) ^ " hundred"
-      else ones.(h) ^ " hundred and"
+      else if r = 0 then List.nth ones h ^ " hundred"
+      else List.nth ones h ^ " hundred and"
     in
     let last_part =
       if r = 0 then ""
-      else if r < 20 then ones.(r)
+      else if r < 20 then List.nth ones r
       else
         let t = r / 10 and o = r mod 10 in
-        if o = 0 then tens.(t) else tens.(t) ^ "-" ^ ones.(o)
+        if o = 0 then List.nth tens t
+        else List.nth tens t ^ "-" ^ List.nth ones o
     in
-    String.trim
-      (String.concat " "
-         (List.filter (fun s -> s <> "") [ hundred_part; last_part ]))
+    String.concat " " (List.filter (( <> ) "") [ hundred_part; last_part ])
 
 let letters_count s =
   let is_letter = function 'a' .. 'z' | 'A' .. 'Z' -> true | _ -> false in
@@ -208,103 +233,79 @@ let letters_count s =
 let letters n = letters_count (str_en_uk n)
 ```
 
-### Решение через хвостовую рекурсию 
+### 1. Решение через хвостовую рекурсию 
 ```ocaml
-open Euler_lib
 open Printf
+open Num_to_words
 
-let a, b = (1, 1000)
-
-let sum_tail a b =
-  let open Num_to_words in
+let () =
+  let a, b = (1, 1000) in
   let rec loop acc n = if n > b then acc else loop (acc + letters n) (n + 1) in
-  loop 0 a
-
-let ans_tail = sum_tail a b
-let () = printf "Answer [Tail Recursion ]: %d\n" ans_tail
+  let ans_tail = loop 0 a in
+  Printf.printf "Answer [Tail Recursion ]: %d\n" ans_tail
 ```
 
 
-### Решение через рекурсию 
+### 2. Решение через рекурсию 
 ```ocaml
-open Euler_lib
 open Printf
+open Num_to_words
 
-let a, b = (1, 1000)
-
-let rec sum_recursive a b =
-  let open Num_to_words in
-  if a > b then 0 else letters a + sum_recursive (a + 1) b
-
-let ans_rec = sum_recursive a b
-let () = printf "Answer [Recursion      ]: %d\n" ans_rec
+let () =
+  let a, b = (1, 1000) in
+  let rec sum_recursive a b =
+    if a > b then 0 else letters a + sum_recursive (a + 1) b
+  in
+  let ans_rec = sum_recursive a b in
+  Printf.printf "Answer [Recursion      ]: %d\n" ans_rec
 ```
 
-### Решение через модульность
-#### Модуль генерации последовательности (lib/seq_generation.ml)
+### 3. Решение через модульность
+#### 3.1. Модуля генерации последовательности 
 ```ocaml
-let ints_list_map a b =
+let list =
+  let a, b = (1, 1000) in
   if a > b then []
   else List.init (b - a + 1) Fun.id |> List.map (fun i -> a + i)
 
-let ints_seq_map a b =
+let seq =
+  let a, b = (1, 1000) in
   if a > b then Seq.empty
   else
     Seq.unfold (fun i -> if i > b - a then None else Some (i, i + 1)) 0
     |> Seq.map (fun i -> a + i)
 ```
 
-#### Модуль фильтра (lib/filter.ml)
+#### 3.2. Модуля фильтра
 ```ocaml
-let in_range_1_1000 n = n >= 1 && n <= 1000
-let keep_valid_ints_list = List.filter in_range_1_1000
-let keep_valid_ints_seq = Seq.filter in_range_1_1000
+let filtered_list = List.filter (fun n -> n >= 1 && n <= 1000) list
+let filtered_seq = Seq.filter (fun n -> n >= 1 && n <= 1000) seq
 ```
 
-#### Модуль fold/reduce (lib/fold.ml)
+#### 3.3. Модуль вычисления с помощью fold
 ```ocaml
-open Num_to_words
-
-let sum_letters_list xs = List.fold_left (fun acc x -> acc + letters x) 0 xs
+let ans_fold = List.fold_left (fun acc x -> acc + letters x) 0 filtered_list
 ```
 
-#### (Модуль) Решение через ленивые коллекции (lib/lazy_seq.ml)
+#### 3.4. Модуль вычисления с помощью ленивых коллекций 
 ```ocaml
-open Num_to_words
-
-let sum_letters_seq s = Seq.fold_left (fun acc n -> acc + letters n) 0 s
+let ans_seq = Seq.fold_left (fun acc x -> acc + letters x) 0 filtered_seq
+```
+#### 3.5. Вывод результатов модулей
+```ocaml
+let () = printf "Answer [Fold/Reduce    ]: %d\n" ans_fold
+let () = printf "Answer [Lazy Seq       ]: %d\n" ans_seq
 ```
 ### Функция test (test/test_euler_17.ml)
 ```ocaml
-open OUnit2
 open Euler_lib
 open Num_to_words
 
-let pp_int = string_of_int
-
-let test_letters _ =
-  assert_equal ~printer:pp_int 23 (letters 342);
-  assert_equal ~printer:pp_int 20 (letters 115)
-
-let test_sum_list_1_5 _ =
-  let xs = Seq_generation.ints_list_map 1 5 |> Filter.keep_valid_ints_list in
-  let sum = Fold.sum_letters_list xs in
-  assert_equal ~printer:pp_int 19 sum
-
-let test_sum_seq_1_5 _ =
-  let s = Seq_generation.ints_seq_map 1 5 |> Filter.keep_valid_ints_seq in
-  let sum = Lazy_seq.sum_letters_seq s in
-  assert_equal ~printer:pp_int 19 sum
-
-let suite =
-  "Euler17 Tests"
-  >::: [
-         "letters_342_115" >:: test_letters;
-         "sum_list_1_5" >:: test_sum_list_1_5;
-         "sum_seq_1_5" >:: test_sum_seq_1_5;
-       ]
-
-let () = run_test_tt_main suite
+let () =
+  assert (letters 342 = 23);
+  assert (letters 115 = 20);
+  assert (List.fold_left (fun acc n -> acc + letters n) 0 [ 1; 2; 3; 4; 5 ] = 19);
+  Printf.printf "✅ All Project Euler 17 tests passed!\n"
 ```
 
 ### Решение через императивный язык (Java) 
