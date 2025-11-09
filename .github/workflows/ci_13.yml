@@ -8,45 +8,49 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest  # virtual machine latest version ubuntu 
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v5 # version 5 of action actions/checkout from GitHub Marketplace : clone repository into here
-        # users : reuse action available
-        
+        uses: actions/checkout@v4
+
       - name: Setup OCaml environment
-        uses: ocaml/setup-ocaml@v3 # from GitHub Marketplace (by OCaml community)
+        uses: ocaml/setup-ocaml@v3
         with:
-          ocaml-compiler: '4.14.0' # version compiler 
-          dune-cache: true # dune has cache for saving compiled files
+          ocaml-compiler: '4.14.0'
+          dune-cache: true
+          opam-repositories: |
+            default: https://github.com/ocaml/opam-repository.git
 
       - name: Install system dependency for zarith (GMP)
-        run: | # run : run shell command / '|' after that is multi-line string
+        run: |
           sudo apt-get update
           sudo apt-get install -y libgmp-dev
 
-      - name: Install OCaml tools and libraries
+      - name: Opam update & install project deps
+        working-directory: euler_13
         run: |
-          opam install -y dune ocamlformat.0.27.0 ounit2 zarith alcotest
+          opam update -y
+          # Chỉ cài deps của project (kể cả deps test); tránh kéo gói lạ ngoài nhu cầu
+          opam install -y . --deps-only --with-test
 
-      - name: OCaml Lint (compiler warnings) #reset the OPAM environment variable
-        working-directory: euler_13 # default: $GITHUB_WORKSPACE
+      - name: Install tooling (latest stable)
         run: |
-          eval $(opam env) 
+          opam install -y dune ocamlformat alcotest
+
+      - name: OCaml Lint (compiler warnings)
+        working-directory: euler_13
+        run: |
+          eval $(opam env)
           echo "Running lint (compiler warnings)..."
           dune build --profile dev
-        # compile project in dev mode (Keep debug info; 
-        # Display warning compiler (warnings); 
-        # Not optimized code (faster when building CI))
-        
+
       - name: Lint opam files
         working-directory: euler_13
         run: |
           eval $(opam env)
           opam lint .
-        # check syntax and structure file opam
-        
+
       - name: Format check
         working-directory: euler_13
         run: |
@@ -67,16 +71,14 @@ jobs:
           done
           exit $failed
 
-
       - name: Build project
         working-directory: euler_13
         run: |
           eval $(opam env)
           dune build
 
-      - name: Run tests
+      - name: Run tests (verbose)
         working-directory: euler_13
         run: |
           eval $(opam env)
-          dune runtest
-        # test file *.ml in test/dune 
+          dune runtest --no-buffer
