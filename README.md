@@ -113,6 +113,7 @@ let filtered_sum_lq : string = filtered_sum_lq sum_lq
 
 #### 3.5. Вывод результатов модулей
 ```ocaml
+(* bin/main.ml *)
 let () =
   Printf.printf
     "The first 10 digits of the sum are [Fold]: \n\
@@ -157,7 +158,7 @@ public class Euler13 {
 }
 ```
 
-#### Результаты выполнения
+#### 5. Результаты выполнения
 OCaml bash:
 ```bash
 The first 10 digits of the sum are [Tail recursion]:
@@ -178,7 +179,7 @@ Process finished with exit code 0
 ```
 
 
-### 5. Вывод результатов тестов
+### 6. Вывод результатов тестов
 ```bash
 {Project Euler 13 - tests}
   Testing `Project Euler 13 - tests'.
@@ -334,6 +335,7 @@ let ans_seq = Seq.fold_left (fun acc x -> acc + letters x) 0 filtered_seq
 ```
 #### 3.5. Вывод результатов модулей
 ```ocaml
+(* bin/main.ml *)
 let () = printf "Answer [Fold/Reduce    ]: %d\n" ans_fold
 let () = printf "Answer [Lazy Seq       ]: %d\n" ans_seq
 ```
@@ -397,7 +399,7 @@ public class Euler17 {
 }
 ```
 
-#### Результаты выполнения
+### 5. Результаты выполнения
 OCaml base:
 ```bash
 Answer [Tail Recursion ]: 21124
@@ -412,7 +414,7 @@ Answer: 21124
 Process finished with exit code 0
 ```
 
-### 5. Вывод результатов тестов
+### 6. Вывод результатов тестов
 ```bash
 {Project Euler 17 - tests}
   Testing `Project Euler 17 - tests'.
