@@ -158,7 +158,7 @@ public class Euler13 {
 }
 ```
 
-#### 5. Результаты выполнения
+### 5. Сравнение результатов выполнения
 OCaml bash:
 ```bash
 The first 10 digits of the sum are [Tail recursion]:
@@ -177,9 +177,83 @@ First 10 digits of sum: 5537376230
 Process finished with exit code 0
 
 ```
+### 6. Тесты
+```ocaml
+(* test/test_euler_13.ml *)
+open Alcotest
+open Data
+open Fold_seq
 
+let expected = "5537376230"
+let numbers : Z.t list = List.map Z.of_string numbers_str_list
+let first10 s = String.sub s 0 10
 
-### 6. Вывод результатов тестов
+let is_digits s =
+  let ok = ref true in
+  String.iter (fun c -> if c < '0' || c > '9' then ok := false) s;
+  !ok
+
+(* Re-implement 2 variants recursion *)
+let tail_first10 () =
+  let rec loop acc = function [] -> acc | x :: tl -> loop Z.(acc + x) tl in
+  numbers |> loop Z.zero |> Z.to_string |> first10
+
+let rec_first10 () =
+  let rec loop = function [] -> Z.zero | x :: tl -> Z.(x + loop tl) in
+  numbers |> loop |> Z.to_string |> first10
+
+(* ===== Test cases ===== *)
+
+let test_tail_rec () =
+  check string "tail recursion gives expected 10 digits" expected
+    (tail_first10 ());
+  check int "length=10 (tail)" 10 (String.length (tail_first10 ()));
+  check bool "digits only (tail)" true (is_digits (tail_first10 ()))
+
+let test_plain_rec () =
+  check string "plain recursion gives expected 10 digits" expected
+    (rec_first10 ());
+  check int "length=10 (rec)" 10 (String.length (rec_first10 ()));
+  check bool "digits only (rec)" true (is_digits (rec_first10 ()))
+
+let test_fold_and_lazy_from_module () =
+  let fold10 = sum_fold_10_digits numbers in
+  let lq10 = sum_lq_10_digits numbers in
+  check string "fold gives expected 10 digits" expected fold10;
+  check string "lazy-seq gives expected 10 digits" expected lq10;
+  check int "length=10 (fold)" 10 (String.length fold10);
+  check int "length=10 (lazy)" 10 (String.length lq10);
+  check bool "digits only (fold)" true (is_digits fold10);
+  check bool "digits only (lazy)" true (is_digits lq10)
+
+let test_filtered_outputs () =
+  let fold10 = sum_fold_10_digits numbers in
+  let lq10 = sum_lq_10_digits numbers in
+  let f_fold = filtered_sum_fold fold10 in
+  let f_lq = filtered_sum_lq lq10 in
+  check string "filtered fold equals fold10" fold10 f_fold;
+  check string "filtered lazy equals lq10" lq10 f_lq;
+  check int "length=10 (filtered fold)" 10 (String.length f_fold);
+  check int "length=10 (filtered lazy)" 10 (String.length f_lq);
+  check bool "digits only (filtered fold)" true (is_digits f_fold);
+  check bool "digits only (filtered lazy)" true (is_digits f_lq)
+
+let () =
+  run "Project Euler 13 - tests"
+    [
+      ("tail recursion", [ test_case "tail_first10" `Quick test_tail_rec ]);
+      ("plain recursion", [ test_case "rec_first10" `Quick test_plain_rec ]);
+      ( "fold & lazy (module values)",
+        [
+          test_case "fold/lazy from module" `Quick
+            test_fold_and_lazy_from_module;
+        ] );
+      ( "filtered variants",
+        [ test_case "filtered fold/lazy" `Quick test_filtered_outputs ] );
+    ]
+```
+
+#### Вывод результатов тестов
 ```bash
 {Project Euler 13 - tests}
   Testing `Project Euler 13 - tests'.
@@ -206,8 +280,9 @@ Process finished with exit code 0
 Итоговая сумма — это общее количество букв для всего диапазона от 1 до 1000.
 
 
-### 0. Функция переключения цифр на буквы (lib/num_to_words.ml)
+### 0. Функция переключения цифр на буквы
 ```ocaml 
+(* lib/num_to_words.ml *)
 let ones =
   [
     "";
@@ -274,6 +349,7 @@ let letters n = letters_count (str_en_uk n)
 
 ### 1. Решение через хвостовую рекурсию 
 ```ocaml
+(* bin/main.ml *)
 open Printf
 open Num_to_words
 
@@ -287,6 +363,7 @@ let () =
 
 ### 2. Решение через рекурсию 
 ```ocaml
+(* bin/main.ml *)
 open Printf
 open Num_to_words
 
@@ -302,6 +379,7 @@ let () =
 ### 3. Решение через модульность
 #### 3.1. Модуля генерации последовательности 
 ```ocaml
+(* bin/main.ml *)
 open Printf
 open Num_to_words
 
@@ -320,17 +398,20 @@ let seq =
 
 #### 3.2. Модуля фильтра
 ```ocaml
+(* bin/main.ml *)
 let filtered_list = List.filter (fun n -> n >= 1 && n <= 1000) list
 let filtered_seq = Seq.filter (fun n -> n >= 1 && n <= 1000) seq
 ```
 
 #### 3.3. Модуль вычисления с помощью fold
 ```ocaml
+(* bin/main.ml *)
 let ans_fold = List.fold_left (fun acc x -> acc + letters x) 0 filtered_list
 ```
 
 #### 3.4. Модуль вычисления с помощью ленивых коллекций 
 ```ocaml
+(* bin/main.ml *)
 let ans_seq = Seq.fold_left (fun acc x -> acc + letters x) 0 filtered_seq
 ```
 #### 3.5. Вывод результатов модулей
@@ -399,7 +480,8 @@ public class Euler17 {
 }
 ```
 
-### 5. Результаты выполнения
+### 5. Сравнение результатов выполнения
+
 OCaml base:
 ```bash
 Answer [Tail Recursion ]: 21124
@@ -414,7 +496,64 @@ Answer: 21124
 Process finished with exit code 0
 ```
 
-### 6. Вывод результатов тестов
+### 6. Тесты
+```ocaml
+(* test/test_euler_17.ml *)
+open Alcotest
+open Euler_lib
+open Num_to_words
+
+let sum_range a b =
+  let rec loop acc n = if n > b then acc else loop (acc + letters n) (n + 1) in
+  loop 0 a
+
+let test_examples () =
+  check int "letters(342)=23" 23 (letters 342);
+  check int "letters(115)=20" 20 (letters 115);
+  check int "sum 1..5 = 19" 19
+    (List.fold_left (fun acc n -> acc + letters n) 0 [ 1; 2; 3; 4; 5 ])
+
+let test_uk_spelling_form () =
+  let s_21 = str_en_uk 21 in
+  let s_40 = str_en_uk 40 in
+  let s_101 = str_en_uk 101 in
+  let s_342 = str_en_uk 342 in
+  let s_1000 = str_en_uk 1000 in
+
+  check bool "21 has hyphen" true (String.contains s_21 '-');
+  check string "40 = forty" "forty" s_40;
+  check bool "101 contains 'and'" true
+    (String.exists (fun _ -> String.contains s_101 'a') s_101
+    && String.contains s_101 'd');
+  check bool "101 has 'hundred and'" true
+    (String.contains s_101 'a' && String.contains s_101 'd'
+    && String.exists (( = ) 'h') s_101);
+  check bool "342 has hyphen and and" true
+    (String.contains s_342 '-' && String.exists (( = ) 'a') s_342);
+  check string "1000 = one thousand" "one thousand" s_1000
+
+let test_letters_count_sanitizes () =
+  let s = "one hundred and twenty-three" in
+  check int "letters_count ignores spaces and hyphen" 24 (letters_count s)
+
+let test_final_answer () =
+  check int "sum 1..1000 = 21124" 21124 (sum_range 1 1000)
+
+let () =
+  run "Project Euler 17 - tests"
+    [
+      ("examples", [ test_case "basic examples" `Quick test_examples ]);
+      ("uk form", [ test_case "spelling checks" `Quick test_uk_spelling_form ]);
+      ( "sanitize",
+        [
+          test_case "letters_count ignores non-letters" `Quick
+            test_letters_count_sanitizes;
+        ] );
+      ("answer", [ test_case "final sum 1..1000" `Quick test_final_answer ]);
+    ]
+```
+
+#### Вывод результатов тестов
 ```bash
 {Project Euler 17 - tests}
   Testing `Project Euler 17 - tests'.
