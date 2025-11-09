@@ -1,0 +1,4 @@
+(test
+ (name test_euler_13)
+ (modules test_euler_13)
+ (libraries alcotest zarith euler_13))
