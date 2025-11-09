@@ -15,17 +15,25 @@
 В рамках решения мы выполняем суммирование всех 100 целых чисел по 50 цифр. Каждое число хранится в виде строки и преобразуется в тип больших целых чисел (`Z.t` в OCaml) с помощью `List.map`.
 Для вычисления суммы используются разные подходы. В конце берутся первые 10 цифр полученной суммы и выводятся на экран.
 
+#### Вводные данные
+```ocaml
+(* lib/data.ml *)
+let numbers_str_list =
+  [
+    (*list of string*)
+    "37107287533902102798797998220837590246510135740250";
+    (*...*)
+    "91942213363574161572522430563301811072406154908250";
+  ]
+```
+
 ### 1. Решение через хвостовую рекурсию 
 ```ocaml
+(* bin/main.ml *)
+open Data
+
 let () =
-  let numbers : Z.t list =
-    List.map Z.of_string
-      [
-        "37107287533902102798797998220837590246510135740250";
-        (* ... *)
-        "53503534226472524250874054075591789781264330331690";
-      ]
-  in
+  let numbers : Z.t list = List.map Z.of_string numbers_str_list in
   let rec loop acc = function [] -> acc | x :: tl -> loop (Z.add acc x) tl in
   let sum = loop Z.zero numbers in
   Printf.printf "The first 10 digits of the sum are [Tail recursion]: \n%s\n"
@@ -34,15 +42,11 @@ let () =
 
 ### 2. Решение через рекурсию 
 ```ocaml
+(* bin/main.ml *)
+open Data
+
 let () =
-  let numbers : Z.t list =
-    List.map Z.of_string
-      [
-        "37107287533902102798797998220837590246510135740250";
-        (* ... *)
-        "53503534226472524250874054075591789781264330331690";
-      ]
-  in
+  let numbers : Z.t list = List.map Z.of_string numbers_str_list in
   let rec loop = function [] -> Z.zero | x :: tl -> Z.add x (loop tl) in
   let sum = loop numbers in
   Printf.printf "The first 10 digits of the sum are [Recursion]: \n%s\n"
@@ -51,44 +55,62 @@ let () =
 ### 3. Решение через модульность
 #### 3.1. Модуль генерации последовательности 
 ```ocaml
-let numbers : Z.t list =
-  let numbers_str : string list =
-    [
-      "37107287533902102798797998220837590246510135740250";
-      (* ... *)
-      "53503534226472524250874054075591789781264330331690";
-    ]
-  in
+(* lib/fold_seq.ml*)
+let generate_numbers x =
+  let numbers_str : string list = x in
   List.map Z.of_string numbers_str
+
+(* bin/main.ml *)
+open Fold_seq
+let numbers : Z.t list = generate_numbers numbers_str_list
 ```
+
 #### 3.2. Модуль вычисления с помощью fold 
 ```ocaml
-let sum_fold_10_digits : string =
-  numbers |> List.fold_left Z.add Z.zero |> Z.to_string |> fun s ->
-  String.sub s 0 10
+(* lib/fold_seq.ml*)
+let sum_fold_10_digits y =
+  y |> List.fold_left Z.add Z.zero |> Z.to_string |> fun s -> String.sub s 0 10
+
+(* bin/main.ml *)
+open Fold_seq
+let sum_fold : string = sum_fold_10_digits numbers
 ```
+
 #### 3.3 Модуль вычисления с помощью ленивых коллекций
 ```ocaml
-let sum_lq_10_digits : string =
-  numbers |> List.to_seq |> Seq.fold_left Z.add Z.zero |> Z.to_string
-  |> fun s -> String.sub s 0 10
+(* lib/fold_seq.ml*)
+let sum_lq_10_digits y =
+  y |> List.to_seq |> Seq.fold_left Z.add Z.zero |> Z.to_string |> fun s ->
+  String.sub s 0 10
+
+(* bin/main.ml *)
+open Fold_seq
+let sum_lq : string = sum_lq_10_digits numbers
 ```
+
 #### 3.4. Модуля фильтра 
 ```ocaml
-let filtered_sum_fold : string =
-  let s = String.trim sum_fold_10_digits in
+(* lib/fold_seq.ml*)
+let filtered_sum_fold z =
+  let s = String.trim z in
   if String.length s = 10 then s
   else (
     Printf.eprintf "[ERROR]: [Fold] Take answer more than 10 digits\n";
     exit 2)
 
-let filtered_sum_lq : string =
-  let s = String.trim sum_lq_10_digits in
+let filtered_sum_lq z =
+  let s = String.trim z in
   if String.length s = 10 then s
   else (
     Printf.eprintf "[ERROR]: [Lazy sequence] Take answer more than 10 digits\n";
     exit 2)
+
+(* bin/main.ml *)
+open Fold_seq
+let filtered_sum_fold : string = filtered_sum_fold sum_fold
+let filtered_sum_lq : string = filtered_sum_lq sum_lq
 ```
+
 #### 3.5. Вывод результатов модулей
 ```ocaml
 let () =
@@ -135,7 +157,7 @@ public class Euler13 {
 }
 ```
 
-### Результаты выполнения
+#### Результаты выполнения
 OCaml bash:
 ```bash
 The first 10 digits of the sum are [Tail recursion]:
@@ -153,6 +175,22 @@ First 10 digits of sum: 5537376230
 
 Process finished with exit code 0
 
+```
+
+
+### 5. Вывод результатов тестов
+```bash
+{Project Euler 13 - tests}
+  Testing `Project Euler 13 - tests'.
+  This run has ID `D0AOKX0N'.
+  
+    [OK]          tail recursion                       0   tail_first10.
+    [OK]          plain recursion                      0   rec_first10.
+    [OK]          fold & lazy (module values)          0   fold/lazy from module.
+    [OK]          filtered variants                    0   filtered fold/lazy.
+  
+  Full test results in `~/work/functional_programming_lab_1/functional_programming_lab_1/euler_13/_build/default/test/_build/_tests/Project Euler 13 - tests'.
+  Test Successful in 0.000s. 4 tests run.
 ```
 
 ## Проблема №17 
@@ -299,19 +337,8 @@ let ans_seq = Seq.fold_left (fun acc x -> acc + letters x) 0 filtered_seq
 let () = printf "Answer [Fold/Reduce    ]: %d\n" ans_fold
 let () = printf "Answer [Lazy Seq       ]: %d\n" ans_seq
 ```
-### Функция test (test/test_euler_17.ml)
-```ocaml
-open Euler_lib
-open Num_to_words
 
-let () =
-  assert (letters 342 = 23);
-  assert (letters 115 = 20);
-  assert (List.fold_left (fun acc n -> acc + letters n) 0 [ 1; 2; 3; 4; 5 ] = 19);
-  Printf.printf "✅ All Project Euler 17 tests passed!\n"
-```
-
-### Решение через императивный язык (Java) 
+### 4. Решение через императивный язык (Java) 
 ```java
 import java.util.stream.IntStream;
 
@@ -370,7 +397,7 @@ public class Euler17 {
 }
 ```
 
-### Результаты выполнения
+#### Результаты выполнения
 OCaml base:
 ```bash
 Answer [Tail Recursion ]: 21124
@@ -383,6 +410,21 @@ Java console:
 Answer: 21124
 
 Process finished with exit code 0
+```
+
+### 5. Вывод результатов тестов
+```bash
+{Project Euler 17 - tests}
+  Testing `Project Euler 17 - tests'.
+  This run has ID `UGJKCMJ3'.
+  
+    [OK]          examples          0   basic examples.
+    [OK]          uk form           0   spelling checks.
+    [OK]          sanitize          0   letters_count ignores non-letters.
+    [OK]          answer            0   final sum 1..1000.
+  
+  Full test results in `~/work/functional_programming_lab_1/functional_programming_lab_1/euler_17/_build/default/test/_build/_tests/Project Euler 17 - tests'.
+  Test Successful in 0.001s. 4 tests run.
 ```
 
 ## Выводы
