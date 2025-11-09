@@ -1,0 +1,6 @@
+(library
+ (name euler_13)
+ (public_name euler_13)
+ (modules Fold_seq Data)
+ (wrapped false)
+ (libraries zarith))

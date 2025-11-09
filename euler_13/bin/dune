@@ -1,5 +1,4 @@
 (executable
- (public_name euler_13)
+ (public_name euler_13_bin)
  (name main)
- (modules main)
- (libraries zarith))
+ (libraries euler_13))
