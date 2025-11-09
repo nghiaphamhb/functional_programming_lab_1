@@ -31,7 +31,7 @@ jobs:
       # 4️⃣ Cài các công cụ và thư viện cần thiết
       - name: Install OCaml tools and libraries
         run: |
-          opam install -y dune ocamlformat.0.27.0 ounit2 zarith
+          opam install -y dune ocamlformat.0.27.0 ounit2 zarith alcotest
 
       # 5️⃣ Lint code (compiler warnings)
       - name: OCaml Lint (compiler warnings)
